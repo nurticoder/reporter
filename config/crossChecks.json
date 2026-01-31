@@ -1,0 +1,4 @@
+{
+  "remaining_cases": "carry_over_cases + initiated_cases + received_from_other_organs + separated_cases + returned_for_fixing_gaps + merged_cases - (sent_to_prosecutor_256 + sent_to_prosecutor_487 + terminated_cases + suspended_cases)"
+}
+

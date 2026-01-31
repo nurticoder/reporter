@@ -1,0 +1,98 @@
+{
+  "carry_over_cases": {
+    "sheet": "Отчет 1-Е Р.2",
+    "rowLabel": "т. 2.1",
+    "rowLabelColumn": "B",
+    "col": "МВД"
+  },
+  "initiated_cases": {
+    "sheet": "Отчет 1-Е Р.2",
+    "rowLabel": "т. 2.2",
+    "rowLabelColumn": "B",
+    "col": "МВД"
+  },
+  "received_from_other_organs": {
+    "sheet": "Отчет 1-Е Р.2",
+    "rowLabel": "т. 2.3",
+    "rowLabelColumn": "B",
+    "col": "МВД"
+  },
+  "separated_cases": {
+    "sheet": "Отчет 1-Е Р.2",
+    "rowLabel": "т. 2.4",
+    "rowLabelColumn": "B",
+    "col": "МВД"
+  },
+  "returned_for_fixing_gaps": {
+    "sheet": "Отчет 1-Е Р.2",
+    "rowLabel": "т. 2.5",
+    "rowLabelColumn": "B",
+    "col": "МВД"
+  },
+  "merged_cases": {
+    "sheet": "Отчет 1-Е Р.2",
+    "rowLabel": "т. 2.6",
+    "rowLabelColumn": "B",
+    "col": "МВД"
+  },
+  "sent_to_prosecutor_256": {
+    "sheet": "Отчет 1-Е Р.2",
+    "rowLabel": "т. 2.7.1",
+    "rowLabelColumn": "B",
+    "col": "МВД"
+  },
+  "sent_to_prosecutor_487": {
+    "sheet": "Отчет 1-Е Р.2",
+    "rowLabel": "т. 2.7.2",
+    "rowLabelColumn": "B",
+    "col": "МВД"
+  },
+  "terminated_cases": {
+    "sheet": "Отчет 1-Е Р.2",
+    "rowLabel": "т. 2.8",
+    "rowLabelColumn": "B",
+    "col": "МВД"
+  },
+  "suspended_cases": {
+    "sheet": "Отчет 1-Е Р.2",
+    "rowLabel": "т. 2.9",
+    "rowLabelColumn": "B",
+    "col": "МВД"
+  },
+  "remaining_cases": {
+    "sheet": "Отчет 1-Е Р.2",
+    "rowLabel": "т. 2.10",
+    "rowLabelColumn": "B",
+    "col": "МВД"
+  },
+  "identified_suspect_cases": {
+    "sheet": "Отчет 1-Е Р.2",
+    "rowLabel": "т. 3.1",
+    "rowLabelColumn": "B",
+    "col": "МВД"
+  },
+  "unidentified_suspect_cases": {
+    "sheet": "Отчет 1-Е Р.2",
+    "rowLabel": "т. 3.2",
+    "rowLabelColumn": "B",
+    "col": "МВД"
+  },
+  "detained_suspects": {
+    "sheet": "Отчет 1-Е Р.2",
+    "rowLabel": "т. 4.1",
+    "rowLabelColumn": "B",
+    "col": "МВД"
+  },
+  "detained_women": {
+    "sheet": "Отчет 1-Е Р.2",
+    "rowLabel": "т. 4.1 (аялдар)",
+    "rowLabelColumn": "B",
+    "col": "МВД"
+  },
+  "detained_minors": {
+    "sheet": "Отчет 1-Е Р.2",
+    "rowLabel": "т. 4.1 (жашы жетпегендер)",
+    "rowLabelColumn": "B",
+    "col": "МВД"
+  }
+}

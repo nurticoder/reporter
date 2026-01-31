@@ -1,0 +1,16 @@
+{
+  "sheet": "Отчет 1-Е Р.2",
+  "rowLabelColumn": "B",
+  "columns": {
+    "women_u18": 17,
+    "women_ge18": 18,
+    "women_total": 19,
+    "stopped": 20,
+    "new": 21,
+    "total_cases": 22
+  },
+  "allowedArticles": [
+    "ст.154",
+    "ст.209"
+  ]
+}
