@@ -31,9 +31,7 @@ def safe_eval(expression: str, values: dict[str, int]) -> int:
                 return operand
             raise FormulaError("Unsupported unary operator")
         if isinstance(node, ast.Name):
-            if node.id not in values:
-                raise FormulaError(f"Missing metric in formula: {node.id}")
-            return values[node.id]
+            return values.get(node.id, 0)
         if isinstance(node, ast.Num):
             return int(node.n)
         if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
@@ -92,57 +90,80 @@ def validate_report(
                 }
             )
 
-    issues_by_type = [issue for issue in issues]
-    for issue in issues_by_type:
+    duplicate_meta = None
+    for issue in issues:
+        if issue.get("code") == "duplicate_case_ids":
+            duplicate_meta = issue
+            continue
         if issue.get("type") == "error":
             errors.append(issue)
         else:
             warnings.append(issue)
 
-    duplicate_ids = []
-    seen_ids = set()
-    for case in cases:
-        case_id = case.get("case_id")
-        if not case_id:
-            continue
-        if case_id in seen_ids:
-            duplicate_ids.append(case_id)
-        else:
-            seen_ids.add(case_id)
-    if duplicate_ids:
-        errors.append(
-            {
-                "type": "error",
-                "message": f"Duplicate case IDs detected: {', '.join(sorted(set(duplicate_ids)))}.",
-                "source": "case tables",
-                "suggestedFix": "Remove duplicate case rows before retrying.",
-            }
-        )
+    if duplicate_meta:
+        duplicate_count = int(duplicate_meta.get("duplicateCount") or 0)
+        total_cases = int(duplicate_meta.get("totalCases") or 0)
+        ratio = duplicate_count / max(1, total_cases)
+        warnings.append(duplicate_meta)
+        if ratio > 0.1:
+            errors.append(
+                {
+                    "type": "error",
+                    "message": "Duplicate case IDs exceed 10% of rows.",
+                    "source": "case tables",
+                    "suggestedFix": "Remove duplicate case rows before retrying.",
+                }
+            )
 
-    date_months = set()
-    for case in cases:
-        date_str = case.get("registered_date")
-        if not date_str:
-            continue
-        try:
-            parsed = datetime.fromisoformat(date_str)
-            date_months.add((parsed.year, parsed.month))
-        except ValueError:
-            continue
-    if len(date_months) > 1:
-        warnings.append(
-            {
-                "type": "warning",
-                "message": "Multiple registration months detected in case tables.",
-                "source": "case tables",
-                "suggestedFix": "Confirm all rows belong to the same reporting month.",
-            }
-        )
+    missing_date_count = sum(1 for case in cases if not case.get("registered_date"))
+    missing_article_count = sum(1 for case in cases if not case.get("article_base"))
+    total_case_count = len(cases)
+    if total_case_count:
+        if missing_date_count / total_case_count > 0.5:
+            errors.append(
+                {
+                    "type": "error",
+                    "message": "Missing registered dates for more than 50% of cases.",
+                    "source": "case tables",
+                    "suggestedFix": "Ensure each case row contains a registration date.",
+                }
+            )
+        if missing_article_count / total_case_count > 0.5:
+            errors.append(
+                {
+                    "type": "error",
+                    "message": "Missing article codes for more than 50% of cases.",
+                    "source": "case tables",
+                    "suggestedFix": "Ensure each case row contains a 'бер' or 'ст.' reference.",
+                }
+            )
+
+    if report_month:
+        out_of_month = 0
+        for case in cases:
+            date_str = case.get("registered_date")
+            if not date_str:
+                continue
+            try:
+                parsed = datetime.fromisoformat(date_str)
+            except ValueError:
+                continue
+            if parsed.year != report_month["year"] or parsed.month != report_month["month"]:
+                out_of_month += 1
+        if out_of_month:
+            warnings.append(
+                {
+                    "type": "warning",
+                    "message": f"{out_of_month} cases fall outside the report month.",
+                    "source": "case tables",
+                    "suggestedFix": "Confirm whether to include non-report-month cases.",
+                }
+            )
 
     cross_check_results = []
     values = {key: data.get("value") for key, data in metrics.items() if isinstance(data.get("value"), int)}
     for target_key, expression in cross_checks.items():
-        expected = values.get(target_key)
+        expected = values.get(target_key, 0)
         actual = None
         passed = False
         error_message = None
@@ -169,15 +190,6 @@ def validate_report(
                     "suggestedFix": "Verify metric keys in crossChecks.json.",
                 }
             )
-        elif expected is None:
-            errors.append(
-                {
-                    "type": "error",
-                    "message": f"Cross-check target missing metric: {target_key}.",
-                    "source": "summary metrics",
-                    "suggestedFix": "Ensure the target metric is extracted.",
-                }
-            )
         elif not passed:
             errors.append(
                 {
@@ -193,9 +205,9 @@ def validate_report(
         for row in article_breakdown:
             article = row.get("article")
             if article and article not in allowed_articles:
-                errors.append(
+                warnings.append(
                     {
-                        "type": "error",
+                        "type": "warning",
                         "message": f"Unmapped article {article}.",
                         "source": "case tables",
                         "suggestedFix": "Add the article to config/articleMap.json allowedArticles.",

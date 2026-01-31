@@ -92,6 +92,15 @@ def main():
 
     if plan_errors:
         validation["errors"].extend(plan_errors)
+    if not plan_updates_list:
+        validation["errors"].append(
+            {
+                "type": "error",
+                "message": "No Excel targets resolved from the mapping configuration.",
+                "source": "excelMap.json",
+                "suggestedFix": "Verify sheet names, row labels, and column headers match the Excel template.",
+            }
+        )
 
     report = build_report(
         report_month=word_data["report_month"],

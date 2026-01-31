@@ -1,0 +1,117 @@
+﻿carry_over_cases:
+  targets:
+    - sheet: "Р.2"
+      row_label_contains: "Остаток неоконченных уг.дел на начало отчетного периода"
+      row_label_column: "B"
+      col_key: "МВД"
+
+initiated_cases:
+  targets:
+    - sheet: "Р.2"
+      row_label_contains: "Зарегистрировано дел в ЕРП (ВУД)"
+      row_label_column: "B"
+      col_key: "МВД"
+
+received_from_other_organs:
+  targets:
+    - sheet: "Р.2"
+      row_label_contains: "Принято дел из других органов"
+      row_label_column: "B"
+      col_key: "МВД"
+
+separated_cases:
+  targets:
+    - sheet: "Р.2"
+      row_label_contains: "выделенных преступлений"
+      row_label_column: "B"
+      col_key: "МВД"
+
+returned_for_fixing_gaps:
+  targets:
+    - sheet: "Р.2"
+      row_label_contains: "Поступило для восполнения пробелов"
+      row_label_column: "B"
+      col_key: "МВД"
+
+merged_cases:
+  targets:
+    - sheet: "Р.2"
+      row_label_contains: "Присоединено дел к другим делам"
+      row_label_column: "B"
+      col_key: "МВД"
+
+sent_to_prosecutor_256:
+  targets:
+    - sheet: "Р.2"
+      row_label_contains: "Направлено дел прокурору"
+      row_label_column: "B"
+      col_key: "МВД"
+
+sent_to_prosecutor_487:
+  targets:
+    - sheet: "Р.2"
+      row_label_contains: "из них направлено в суд"
+      row_label_column: "B"
+      col_key: "МВД"
+
+terminated_cases:
+  targets:
+    - sheet: "Р.2"
+      row_label_contains: "Прекращено дел из числа оконченных"
+      row_label_column: "B"
+      col_key: "МВД"
+
+suspended_cases:
+  targets:
+    - sheet: "Р.2"
+      row_label_contains: "Приостановлено дел производством"
+      row_label_column: "B"
+      col_key: "МВД"
+
+remaining_cases:
+  targets:
+    - sheet: "Р.2"
+      row_label_contains: "Остаток неоконченных дел на конец отчетного периода"
+      row_label_column: "B"
+      col_key: "МВД"
+
+identified_suspect_cases:
+  targets:
+    - sheet: "Р.2"
+      row_label_contains: "установлено подозреваем"
+      row_label_column: "B"
+      col_key: "МВД"
+
+unidentified_suspect_cases:
+  targets:
+    - sheet: "Р.2"
+      row_label_contains: "не установлено подозреваем"
+      row_label_column: "B"
+      col_key: "МВД"
+
+detained_suspects:
+  targets:
+    - sheet: "Р.2"
+      row_label_contains: "Задержание лиц, подозреваемых"
+      row_label_column: "B"
+      row_code: "т. 2.5."
+      row_code_column: "A"
+      col_key: "МВД"
+
+detained_women:
+  targets:
+    - sheet: "Р.2"
+      row_label_contains: "из них женщин (из строк 191 и 192)"
+      row_label_column: "B"
+      row_code: "т. 2.5."
+      row_code_column: "A"
+      col_key: "МВД"
+
+detained_minors:
+  targets:
+    - sheet: "Р.2"
+      row_label_contains: "из них детей (из строк 191 и 192)"
+      row_label_column: "B"
+      row_code: "т. 2.5."
+      row_code_column: "A"
+      col_key: "МВД"

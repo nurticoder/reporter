@@ -4,6 +4,8 @@ import hashlib
 from datetime import datetime
 from typing import Any
 
+import re
+
 from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
 
@@ -22,12 +24,57 @@ def normalize_label(label: str) -> str:
     return "".join(cleaned.split())
 
 
-def find_row_by_label(ws, label: str, col_letter: str = "B") -> int | None:
-    target = normalize_label(label)
+def normalize_sheet_name(name: str) -> str:
+    if name is None:
+        return ""
+    cleaned = (
+        str(name)
+        .replace("\u00a0", " ")
+        .replace("–", "-")
+        .replace("—", "-")
+        .strip()
+        .lower()
+    )
+    cleaned = cleaned.replace("ё", "е")
+    cleaned = re.sub(r"\s+", " ", cleaned)
+    return re.sub(r"[\s\.-]+", "", cleaned)
+
+
+def resolve_sheet_name(workbook, desired: str) -> str | None:
+    if desired in workbook.sheetnames:
+        return desired
+    target = normalize_sheet_name(desired)
+    partial_matches = []
+    for name in workbook.sheetnames:
+        normalized = normalize_sheet_name(name)
+        if normalized == target:
+            return name
+        if target and (normalized.endswith(target) or target.endswith(normalized) or target in normalized):
+            partial_matches.append(name)
+    if len(partial_matches) == 1:
+        return partial_matches[0]
+    return None
+
+
+def find_row_by_label(
+    ws,
+    label: str | None,
+    col_letter: str = "B",
+    label_contains: str | None = None,
+    label_regex: str | None = None,
+) -> int | None:
+    target = normalize_label(label) if label else ""
+    contains_target = normalize_label(label_contains) if label_contains else ""
+    regex = re.compile(label_regex, re.IGNORECASE) if label_regex else None
     matches = []
     for row in range(1, ws.max_row + 1):
         value = ws[f"{col_letter}{row}"].value
-        if normalize_label(value) == target:
+        normalized_value = normalize_label(value)
+        if regex and value is not None and regex.search(str(value)):
+            matches.append(row)
+        elif contains_target and contains_target in normalized_value:
+            matches.append(row)
+        elif target and normalized_value == target:
             matches.append(row)
     if len(matches) > 1:
         raise ValueError(f"Multiple rows matched label '{label}' in sheet {ws.title}.")
@@ -57,7 +104,8 @@ def plan_metric_updates(workbook, metrics: dict, excel_map: dict) -> tuple[list[
         col = mapping.get("col")
         header_row = mapping.get("headerRow")
 
-        if sheet_name not in workbook.sheetnames:
+        resolved_sheet = resolve_sheet_name(workbook, sheet_name)
+        if not resolved_sheet:
             errors.append(
                 {
                     "type": "error",
@@ -68,9 +116,15 @@ def plan_metric_updates(workbook, metrics: dict, excel_map: dict) -> tuple[list[
             )
             continue
 
-        ws = workbook[sheet_name]
+        ws = workbook[resolved_sheet]
         try:
-            row = find_row_by_label(ws, row_label, col_letter=mapping.get("rowLabelColumn", "B"))
+            row = find_row_by_label(
+                ws,
+                row_label,
+                col_letter=mapping.get("rowLabelColumn", "B"),
+                label_contains=mapping.get("rowLabelContains"),
+                label_regex=mapping.get("rowLabelRegex"),
+            )
         except ValueError as exc:
             errors.append(
                 {
@@ -133,7 +187,8 @@ def plan_article_updates(workbook, article_breakdown: list[dict], article_map: d
     if not sheet_name:
         return updates, errors
 
-    if sheet_name not in workbook.sheetnames:
+    resolved_sheet = resolve_sheet_name(workbook, sheet_name)
+    if not resolved_sheet:
         errors.append(
             {
                 "type": "error",
@@ -144,7 +199,7 @@ def plan_article_updates(workbook, article_breakdown: list[dict], article_map: d
         )
         return updates, errors
 
-    ws = workbook[sheet_name]
+    ws = workbook[resolved_sheet]
     row_label_column = article_map.get("rowLabelColumn", "B")
     columns = article_map.get("columns", {})
 
@@ -153,7 +208,13 @@ def plan_article_updates(workbook, article_breakdown: list[dict], article_map: d
         if not article:
             continue
         try:
-            excel_row = find_row_by_label(ws, article, col_letter=row_label_column)
+            excel_row = find_row_by_label(
+                ws,
+                article,
+                col_letter=row_label_column,
+                label_contains=article_map.get("rowLabelContains"),
+                label_regex=article_map.get("rowLabelRegex"),
+            )
         except ValueError as exc:
             errors.append(
                 {

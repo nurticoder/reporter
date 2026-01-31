@@ -1,0 +1,8 @@
+﻿sheet: "Отчет 1-Е Р.1"
+row_label_column: "B"
+row_label_regex: "^ст\\.?\\s*\\d+"
+fields:
+  new:
+    header_contains: "ЗАРЕГ. (дел) 2"
+  stopped:
+    header_contains: "ПРЕКРАЩ. (дел) 2"
